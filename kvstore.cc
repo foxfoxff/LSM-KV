@@ -1,8 +1,13 @@
 #include "kvstore.h"
-#include <string>
 
-KVStore::KVStore(const std::string &dir): KVStoreAPI(dir)
+
+KVStore::KVStore(const std::string &dir): KVStoreAPI(dir),level(0),index(0),timestamp(0)
 {
+    workingdir=dir;
+    if(!utils::dirExists(dir)){
+        utils::mkdir(dir.c_str());
+    }
+    cur_memtab=new MemTable();
 }
 
 KVStore::~KVStore()
@@ -15,6 +20,7 @@ KVStore::~KVStore()
  */
 void KVStore::put(uint64_t key, const std::string &s)
 {
+    cur_memtab->put(key,s);
 }
 /**
  * Returns the (string) value of the given key.
@@ -22,7 +28,8 @@ void KVStore::put(uint64_t key, const std::string &s)
  */
 std::string KVStore::get(uint64_t key)
 {
-	return "";
+    string *rel = cur_memtab->get(key);
+	return *rel;
 }
 /**
  * Delete the given key-value pair if it exists.
@@ -30,7 +37,8 @@ std::string KVStore::get(uint64_t key)
  */
 bool KVStore::del(uint64_t key)
 {
-	return false;
+    return cur_memtab->remove(key);
+
 }
 
 /**
@@ -39,4 +47,16 @@ bool KVStore::del(uint64_t key)
  */
 void KVStore::reset()
 {
+}
+
+
+void KVStore::toSStable() {
+    auto path=getpath();
+    if(!utils::dirExists(path))
+        mkdir(path.c_str());
+
+    SStable *_sstable = new SStable(workingdir,timestamp,cur_memtab->size(),cur_memtab->getkeys());
+
+    sstable.push_back(_sstable);
+
 }

@@ -1,2 +1,11 @@
+cmake-build-debug-mingw
+.gitattributes
+.idea/.name
+.gitattributes
+.idea/LSM-KV.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+CMakeLists.txt
+byqt/CMakeLists.txt
 
-data/.gitkeep

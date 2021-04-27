@@ -1,10 +1,21 @@
 #pragma once
-
+#include <string>
 #include "kvstore_api.h"
+#include "MemTable.h"
+#include "utils.h"
+#include "SStable.h"
+#include "MurmurHash3.h"
+#include <list>
 
 class KVStore : public KVStoreAPI {
 	// You can add your implementation here
 private:
+    std::string  workingdir;
+    MemTable *cur_memtab;
+    std::list<SStable*> sstable;
+    uint64_t timestamp;
+    int level;
+    int index;
 
 public:
 	KVStore(const std::string &dir);
@@ -18,5 +29,12 @@ public:
 	bool del(uint64_t key) override;
 
 	void reset() override;
+
+	void toSStable();
+
+	std::string getpath(){
+	    auto path = workingdir+"/level_"+std::to_string(level);
+	    return path;
+	}
 
 };
